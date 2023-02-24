@@ -173,5 +173,6 @@ fn spawn_scene(
             },
             Vec3::new(12.0, 12.0, 12.0),
             Vec3::new(0., 0., 0.),
+            Vec3::Y
         ));
 }

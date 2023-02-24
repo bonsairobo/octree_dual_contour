@@ -11,4 +11,4 @@ ilattice = { git = "https://github.com/bonsairobo/ilattice-rs", rev = "8c9ebdefa
 
 [dev-dependencies]
 bevy = "0.9"
-smooth-bevy-cameras = "0.6"
+smooth-bevy-cameras = "0.7"
