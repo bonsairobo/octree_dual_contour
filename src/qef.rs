@@ -50,32 +50,23 @@ impl Qef {
     }
 
     pub fn minimizer(&self) -> Vec3A {
-        let a = self.a00;
-        let b = self.a01;
-        let c = self.a02;
-        let d = self.a11;
-        let e = self.a12;
-        let f = self.a22;
+        let [a, b, c, d, e, f] = [self.a00, self.a01, self.a02, self.a11, self.a12, self.a22];
 
-        let ad = a * d;
         let ae = a * e;
-        let af = a * f;
-        let bc = b * c;
-        let be = b * e;
         let bf = b * f;
         let df = d * f;
         let ce = c * e;
         let cd = c * d;
 
-        let be_cd = be - cd;
-        let bc_ae = bc - ae;
+        let be_cd = b * e - cd;
+        let bc_ae = b * c - ae;
         let ce_bf = ce - bf;
 
         let denom = 1.0 / (a * df + 2.0 * b * ce - ae * e - bf * b - cd * c);
 
         let nom0 = self.b.dot(Vec3A::new(df - e * e, ce_bf, be_cd));
-        let nom1 = self.b.dot(Vec3A::new(ce_bf, af - c * c, bc_ae));
-        let nom2 = self.b.dot(Vec3A::new(be_cd, bc_ae, ad - b * b));
+        let nom1 = self.b.dot(Vec3A::new(ce_bf, a * f - c * c, bc_ae));
+        let nom2 = self.b.dot(Vec3A::new(be_cd, bc_ae, a * d - b * b));
 
         denom * Vec3A::new(nom0, nom1, nom2)
     }
