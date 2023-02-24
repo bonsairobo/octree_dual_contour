@@ -5,7 +5,7 @@ use bevy::{
 };
 use glam::{Vec3, Vec3A};
 use ilattice::prelude::Extent;
-use multires_dual_contour::{
+use octree_dual_contour::{
     central_gradient, repair_sharp_normals, sdf_primitives::*, CellOctree, MeshVertexId,
 };
 use smooth_bevy_cameras::{controllers::fps::*, LookTransformPlugin};
@@ -173,5 +173,6 @@ fn spawn_scene(
             },
             Vec3::new(12.0, 12.0, 12.0),
             Vec3::new(0., 0., 0.),
+            Vec3::Y
         ));
 }
