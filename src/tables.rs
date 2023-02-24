@@ -1,5 +1,4 @@
-/// Pairs of octants (o0, o1) where o0 and o1 are face-adjacent. o0 and o1 have
-/// different parents.
+/// Pairs of octants (o0, o1) where o0 and o1 are face-adjacent.
 pub const FACE_ADJACENT_OCTANTS: [[[u8; 2]; 4]; 3] = [
     [
         //  -X     +X
