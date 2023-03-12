@@ -80,50 +80,49 @@ impl CellOctree {
         let mut all_nonempty_children_can_merge = true;
         let mut any_nonempty_children = false;
         let mut has_vert = [false; 8];
-        let children = branch.get_children(&sdf, branch.depth + 1 == max_depth);
+        let children = branch.get_children(sdf, branch.depth + 1 == max_depth);
         for ((maybe_child, maybe_child_id), has_vert) in children
             .into_iter()
             .zip(&mut child_cell_ids)
             .zip(&mut has_vert)
         {
-            if let Some(mut child_cell) = maybe_child {
-                if child_cell.is_leaf {
-                    let (regularized_qef, exact_qef) = child_cell.estimate_vertex(sdf, precision);
-                    sum_descendant_regularized_qef =
-                        sum_descendant_regularized_qef + regularized_qef;
-                    sum_descendant_exact_qef = sum_descendant_exact_qef + exact_qef;
+            let Some(mut child_cell) = maybe_child else { continue };
 
-                    any_nonempty_children = true;
-                    let child_id = self.all_cells.len() as CellId;
-                    self.all_cells.push(child_cell);
-                    *maybe_child_id = Some(child_id);
-                } else {
-                    let (child_id, child_state) = self.build_recursive_from_branch(
-                        max_depth,
-                        error_tolerance,
-                        precision,
-                        sdf,
-                        child_cell,
-                    );
-                    match child_state {
-                        VertexState::EmptySpace => {}
-                        VertexState::CannotSimplify => {
-                            any_nonempty_children = true;
-                            all_nonempty_children_can_merge = false;
-                        }
-                        VertexState::HasVertex {
-                            regularized_qef,
-                            exact_qef,
-                        } => {
-                            any_nonempty_children = true;
-                            sum_descendant_regularized_qef =
-                                sum_descendant_regularized_qef + regularized_qef;
-                            sum_descendant_exact_qef = sum_descendant_exact_qef + exact_qef;
-                            *has_vert = true;
-                        }
+            if child_cell.is_leaf {
+                let (regularized_qef, exact_qef) = child_cell.estimate_vertex(sdf, precision);
+                sum_descendant_regularized_qef = sum_descendant_regularized_qef + regularized_qef;
+                sum_descendant_exact_qef = sum_descendant_exact_qef + exact_qef;
+
+                any_nonempty_children = true;
+                let child_id = self.all_cells.len() as CellId;
+                self.all_cells.push(child_cell);
+                *maybe_child_id = Some(child_id);
+            } else {
+                let (child_id, child_state) = self.build_recursive_from_branch(
+                    max_depth,
+                    error_tolerance,
+                    precision,
+                    sdf,
+                    child_cell,
+                );
+                match child_state {
+                    VertexState::EmptySpace => {}
+                    VertexState::CannotSimplify => {
+                        any_nonempty_children = true;
+                        all_nonempty_children_can_merge = false;
                     }
-                    *maybe_child_id = child_id;
+                    VertexState::HasVertex {
+                        regularized_qef,
+                        exact_qef,
+                    } => {
+                        any_nonempty_children = true;
+                        sum_descendant_regularized_qef =
+                            sum_descendant_regularized_qef + regularized_qef;
+                        sum_descendant_exact_qef = sum_descendant_exact_qef + exact_qef;
+                        *has_vert = true;
+                    }
                 }
+                *maybe_child_id = child_id;
             }
         }
 
@@ -137,22 +136,20 @@ impl CellOctree {
         // Post-order simplification can change branches into pseudo-leaves.
 
         let mut vertex_state = VertexState::CannotSimplify;
-        if all_nonempty_children_can_merge {
-            if cell_is_bipolar(&branch.samples) {
-                // Branch vertex should be estimated. Only keep if it meets
-                // error criterion.
-                branch.estimate_vertex_with_qef(
-                    &sum_descendant_regularized_qef,
-                    &sum_descendant_exact_qef,
-                );
-                if branch.qef_error <= error_tolerance {
-                    // Simplify by choosing a vertex in this branch node.
-                    branch.is_leaf = true; // pseudo-leaf
-                    vertex_state = VertexState::HasVertex {
-                        regularized_qef: sum_descendant_regularized_qef,
-                        exact_qef: sum_descendant_exact_qef,
-                    };
-                }
+        if all_nonempty_children_can_merge && cell_is_bipolar(&branch.samples) {
+            // Branch vertex should be estimated. Only keep if it meets
+            // error criterion.
+            branch.estimate_vertex_with_qef(
+                &sum_descendant_regularized_qef,
+                &sum_descendant_exact_qef,
+            );
+            if branch.qef_error <= error_tolerance {
+                // Simplify by choosing a vertex in this branch node.
+                branch.is_leaf = true; // pseudo-leaf
+                vertex_state = VertexState::HasVertex {
+                    regularized_qef: sum_descendant_regularized_qef,
+                    exact_qef: sum_descendant_exact_qef,
+                };
             }
         }
 
