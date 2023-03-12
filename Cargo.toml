@@ -6,9 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-glam = "0.22"
-ilattice = { git = "https://github.com/bonsairobo/ilattice-rs", rev = "8c9ebdefa0fc90b3e6d38fca8f84b9ef206b0572" }
+glam = "0.23"
+ilattice = { git = "https://github.com/bonsairobo/ilattice-rs", rev = "457fae6a561b55dbf2eb24646b7eca4564581103" }
 
 [dev-dependencies]
-bevy = "0.9"
-smooth-bevy-cameras = "0.7"
+bevy = "0.10"
+smooth-bevy-cameras = "0.8"

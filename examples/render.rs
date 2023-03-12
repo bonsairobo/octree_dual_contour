@@ -13,7 +13,7 @@ use std::time::Instant;
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa::Sample4)
         .add_plugins(DefaultPlugins)
         .add_plugin(WireframePlugin)
         .add_plugin(LookTransformPlugin)
