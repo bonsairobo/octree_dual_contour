@@ -14,11 +14,13 @@ use std::time::Instant;
 fn main() {
     App::new()
         .insert_resource(Msaa::Sample4)
-        .add_plugins(DefaultPlugins)
-        .add_plugin(WireframePlugin)
-        .add_plugin(LookTransformPlugin)
-        .add_plugin(FpsCameraPlugin::default())
-        .add_startup_system(spawn_scene)
+        .add_plugins((
+            DefaultPlugins,
+            WireframePlugin,
+            LookTransformPlugin,
+            FpsCameraPlugin::default(),
+        ))
+        .add_systems(Startup, spawn_scene)
         .run();
 }
 
